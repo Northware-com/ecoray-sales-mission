@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#000000"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>EcoRay · Sales Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#000; --panel:#070707; --line:rgba(255,255,255,.12); --text:#f3f3f3;
+  --dim:rgba(243,243,243,.55); --mint:#1BFC9E; --warn:#ff6b4a; --good:#1BFC9E; --mid:#f5c542;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Space Grotesk",system-ui,sans-serif}
+body{min-height:100dvh;overflow-x:hidden}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.scan{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.12;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.03) 3px)}
+.shell{position:relative;z-index:2;width:min(1440px,100%);margin:0 auto;padding:14px 14px 28px;display:grid;gap:12px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
+  border:1px solid var(--line);background:rgba(8,8,8,.92);padding:12px 14px;border-radius:4px}
+.brand{display:flex;gap:10px;align-items:center;font-family:"IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}
+.brand i{width:10px;height:10px;background:var(--mint);box-shadow:0 0 18px var(--mint);display:block}
+.meta{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.meta b{color:var(--mint)}
+.btn{border:1px solid var(--line);background:#0b0b0b;color:var(--text);border-radius:3px;padding:10px 12px;
+  font:600 .75rem "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.btn.mint{border-color:rgba(27,252,158,.45);color:var(--mint);background:rgba(27,252,158,.08)}
+.btn:hover{border-color:rgba(255,255,255,.3)}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border-radius:4px;padding:16px;position:relative;overflow:hidden}
+.card::after{content:"";position:absolute;inset:auto -20% -50% -20%;height:80%;background:radial-gradient(ellipse at center,rgba(27,252,158,.08),transparent 60%);pointer-events:none}
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint);margin:0 0 8px}
+h1{margin:0;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.03em;line-height:1}
+.sub{margin:10px 0 0;color:var(--dim);line-height:1.45;max-width:40rem}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{border:1px solid var(--line);background:#060606;border-radius:4px;padding:12px;display:grid;gap:8px;min-height:132px}
+.kpi .label{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.kpi .value{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:700;letter-spacing:-.02em}
+.kpi .target{font-family:"IBM Plex Mono",monospace;font-size:.68rem;color:var(--dim)}
+.bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--mint);box-shadow:0 0 12px rgba(27,252,158,.45)}
+.bar.warn>i{background:var(--warn);box-shadow:0 0 12px rgba(255,107,74,.35)}
+.bar.mid>i{background:var(--mid);box-shadow:0 0 12px rgba(245,197,66,.35)}
+.pace{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase}
+.pace.good{color:var(--good)}.pace.bad{color:var(--warn)}.pace.mid{color:var(--mid)}
+.grid2{display:grid;grid-template-columns:1.35fr .9fr;gap:12px}
+@media(max-width:980px){.grid2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+th{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:500}
+tr:hover td{background:rgba(27,252,158,.04)}
+.rank{font-family:"IBM Plex Mono",monospace;color:var(--mint);font-weight:700;width:36px}
+.name{font-weight:600}
+.num{font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",monospace;font-size:.85rem}
+.pill{display:inline-block;padding:2px 7px;border-radius:2px;border:1px solid rgba(27,252,158,.35);color:var(--mint);font-family:"IBM Plex Mono",monospace;font-size:.65rem}
+.pill.hot{border-color:rgba(255,107,74,.45);color:#ffb09a}
+.chart{height:180px;width:100%}
+.side{display:grid;gap:10px}
+.big{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;letter-spacing:-.03em}
+.feed{display:grid;gap:8px;max-height:280px;overflow:auto}
+.feed .item{border:1px solid var(--line);background:#050505;padding:10px;border-radius:3px;display:grid;gap:4px}
+.feed .t{font-family:"IBM Plex Mono",monospace;font-size:.62rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.feed .m{font-size:.92rem}
+.gate{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.86);display:grid;place-items:center;padding:16px;backdrop-filter:blur(8px)}
+.gate.hidden{display:none}
+.gate-box{width:min(420px,100%);border:1px solid var(--line);background:#080808;padding:22px;border-radius:4px;display:grid;gap:12px}
+.gate-box h2{margin:0;font-size:1.3rem}
+.gate-box p{margin:0;color:var(--dim);font-size:.9rem;line-height:1.45}
+input[type=password],input[type=text]{width:100%;border:1px solid var(--line);background:#050505;color:var(--text);border-radius:3px;padding:12px;font:500 .9rem "IBM Plex Mono",monospace}
+.err{color:#ffb4b4;font-size:.82rem;min-height:1.1em}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--dim);
+  font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+.note{color:var(--dim);font-size:.8rem;line-height:1.4}
+</style>
+</head>
+<body data-build="mission-v1">
+<canvas id="stars"></canvas>
+<div class="scan"></div>
+
+<div class="gate" id="gate">
+  <form class="gate-box" id="gateForm">
+    <div class="brand"><i></i> EcoRay // Restricted</div>
+    <h2>Sales Mission Control</h2>
+    <p>Internal team board. Enter access code to arm the console. (Demo gate for prototype - replace with real auth before production.)</p>
+    <label class="note">Access code
+      <input id="code" type="password" autocomplete="current-password" placeholder="••••••••" required/>
+    </label>
+    <button class="btn mint" type="submit">Authenticate</button>
+    <div class="err" id="gateErr"></div>
+    <p class="note">Prototype data from HeroBase week scoreboard screenshot (not live API aggregates yet).</p>
+  </form>
+</div>
+
+<div class="shell" id="app" hidden>
+  <header class="top">
+    <div class="brand"><i></i> EcoRay // Sales Mission Control</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="meta">Week lock · Status <b id="status">LIVE MOCK</b> · Build mission-v1</div>
+      <button class="btn" id="tv" type="button">TV mode</button>
+      <button class="btn mint" id="refresh" type="button">Refresh</button>
+      <button class="btn" id="logout" type="button">Lock</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="card">
+      <p class="kicker">Weekly acquisition window</p>
+      <h1>SCOREBOARD<br>THIS WEEK</h1>
+      <p class="sub">Mission readout of dial pressure, conversations, closes and revenue. Designed for the wall and the war room - not a spreadsheet with gauges.</p>
+    </div>
+    <div class="card">
+      <p class="kicker">Command strip</p>
+      <div style="display:grid;gap:10px;margin-top:8px">
+        <div class="meta">Revenue pace vs 5.0M target</div>
+        <div class="big" id="revBig">1.246.836</div>
+        <div class="bar mid" id="revBar"><i style="width:24.9%"></i></div>
+        <div class="pace mid" id="revPace">24.9% of 5.000.000 · needs acceleration</div>
+        <div class="note">Success closes <b style="color:var(--warn)">9 / 20</b> target · primary bottleneck</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid2">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:end;margin-bottom:8px">
+        <div>
+          <p class="kicker" style="margin:0">Agent leaderboard</p>
+          <div style="font-size:1.1rem;font-weight:700;margin-top:4px">Who is carrying the week</div>
+        </div>
+        <span class="pill" id="topPill">TOP GUN</span>
+      </div>
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Agent</th><th>S</th><th>Attempts</th><th>Talks</th><th>Contact %</th><th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <p class="kicker">Attempts trajectory</p>
+        <canvas class="chart" id="chart" width="640" height="180"></canvas>
+        <p class="note" style="margin-top:8px">Multi-agent attempt volume across the week (mock series from HB chart shape).</p>
+      </div>
+      <div class="card">
+        <p class="kicker">Mission feed</p>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>EcoRay internal · mock week board</span>
+    <span>Next: live HB/calls reverse + real auth</span>
+  </footer>
+</div>
+
+<script>
+// Demo access code for prototype only - change before any real deploy with secrets
+const ACCESS = 'ecoray-mission';
+const KEY = 'ecoray_mission_auth_v1';
+
+const KPIS = [
+  {label:'Opkaldsforsøg', value:2494, target:1500, fmt:n=>n.toLocaleString('da-DK'), good:true},
+  {label:'Samtaler', value:914, target:500, fmt:n=>n.toLocaleString('da-DK'), good:true},
+  {label:'Success closes', value:9, target:20, fmt:n=>String(n), good:false},
+  {label:'Samtaletid', value:63+56/60, target:100, display:'63:56:39', fmt:null, good:false, mid:true},
+  {label:'Omsætning', value:1246836, target:5000000, fmt:n=>n.toLocaleString('da-DK'), good:false, mid:true},
+];
+
+const AGENTS = [
+  {rank:1,name:'Jacob Barrett Laursen', s:3, att:293, talks:162, rate:55, rev:483000, hot:true},
+  {rank:2,name:'Christoffer Lund Hansen', s:2, att:280, talks:150, rate:54, rev:280000},
+  {rank:3,name:'Anders Kirkegaard', s:1, att:210, talks:120, rate:57, rev:165000},
+  {rank:4,name:'Nicolai Grassi', s:1, att:198, talks:110, rate:56, rev:152000},
+  {rank:5,name:'Andreas Talarek', s:1, att:188, talks:105, rate:56, rev:148000},
+  {rank:6,name:'Casper Nicolaisen', s:0, att:175, talks:98, rate:56, rev:0},
+  {rank:7,name:'Christian Jensen', s:0, att:160, talks:90, rate:56, rev:0},
+  {rank:8,name:'Emre Selvi', s:0, att:155, talks:86, rate:55, rev:0},
+  {rank:9,name:'Oliver Lyng', s:1, att:148, talks:84, rate:57, rev:120000},
+  {rank:10,name:'Sherif Anvari', s:0, att:140, talks:78, rate:56, rev:0},
+  {rank:11,name:'Mohammad Wassim Ibrahim', s:0, att:132, talks:74, rate:56, rev:0},
+  {rank:12,name:'Vitus Bjørkvin', s:0, att:120, talks:70, rate:58, rev:0},
+];
+
+const FEED = [
+  {t:'Week signal', m:'Success pace 9/20 - primary failure mode is close rate, not dial volume.'},
+  {t:'Pressure', m:'Attempts 2494 vs 1500 target - floor is over-indexing activity.'},
+  {t:'Top gun', m:'Jacob leading with 3 successes and ~483k attributed revenue (mock).'},
+  {t:'Revenue', m:'1.25M of 5.0M week ambition - 24.9% filled.'},
+  {t:'API note', m:'Enreach /users + /campaigns live; scoreboard aggregates not exposed yet.'},
+];
+
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// stars
+const canvas=$('stars'), ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){
+  const d=devicePixelRatio||1; canvas.width=innerWidth*d; canvas.height=innerHeight*d; ctx.setTransform(d,0,0,d,0,0);
+  stars=Array.from({length:reduce?30:120},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.2,a:Math.random()}));
+}
+resize(); addEventListener('resize', resize);
+(function loop(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  for(const s of stars){ if(!reduce){s.y+=s.z*.12; if(s.y>innerHeight){s.y=0;s.x=Math.random()*innerWidth}} ctx.globalAlpha=.2+s.a*.5; ctx.fillStyle='#fff'; ctx.fillRect(s.x,s.y,s.z,s.z)}
+  ctx.globalAlpha=1; requestAnimationFrame(loop);
+})();
+
+function unlock(){ $('gate').classList.add('hidden'); $('app').hidden=false; sessionStorage.setItem(KEY,'1'); }
+function lock(){ sessionStorage.removeItem(KEY); $('app').hidden=true; $('gate').classList.remove('hidden'); $('code').value=''; }
+
+$('gateForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  if(($('code').value||'').trim()===ACCESS){ $('gateErr').textContent=''; unlock(); }
+  else $('gateErr').textContent='Invalid code';
+});
+$('logout').onclick=lock;
+$('tv').onclick=()=>{ document.body.requestFullscreen?.(); };
+$('refresh').onclick=()=>{ $('status').textContent='RELOADED'; setTimeout(()=>$('status').textContent='LIVE MOCK',800); render(); };
+
+function pct(v,t){ return Math.max(0, Math.min(100, (v/t)*100)); }
+function renderKpis(){
+  const el=$('kpis'); el.innerHTML='';
+  KPIS.forEach(k=>{
+    const p=pct(k.value,k.target);
+    const cls = k.good ? '' : (k.mid ? ' mid' : ' warn');
+    const pace = k.good ? 'good' : (k.mid ? 'mid' : 'bad');
+    const paceTxt = k.good ? 'ABOVE TARGET' : (p>=50 ? 'BEHIND' : 'CRITICAL');
+    const val = k.display || k.fmt(k.value);
+    el.innerHTML += `<article class="kpi"><div class="label">${k.label}</div><div class="value">${val}</div><div class="bar${cls}"><i style="width:${p.toFixed(1)}%"></i></div><div class="target">Target ${k.display?k.target:k.fmt(k.target)} · ${p.toFixed(0)}%</div><div class="pace ${pace}">${paceTxt}</div></article>`;
+  });
+}
+function renderTable(){
+  const tb=$('tbody'); tb.innerHTML='';
+  AGENTS.forEach(a=>{
+    tb.innerHTML += `<tr>
+      <td class="rank">${a.rank}</td>
+      <td class="name">${a.name}${a.hot?' <span class="pill hot">HOT</span>':''}</td>
+      <td class="num">${a.s}</td>
+      <td class="num">${a.att}</td>
+      <td class="num">${a.talks}</td>
+      <td class="num">${a.rate}%</td>
+      <td class="num">${a.rev.toLocaleString('da-DK')}</td>
+    </tr>`;
+  });
+  $('topPill').textContent = 'TOP GUN · ' + AGENTS[0].name.split(' ')[0].toUpperCase();
+}
+function renderFeed(){
+  $('feed').innerHTML = FEED.map(f=>`<div class="item"><div class="t">${f.t}</div><div class="m">${f.m}</div></div>`).join('');
+}
+function renderChart(){
+  const c=$('chart'), x=c.getContext('2d');
+  const w=c.width, h=c.height; x.clearRect(0,0,w,h);
+  // grid
+  x.strokeStyle='rgba(255,255,255,.08)';
+  for(let i=0;i<5;i++){ const y=20+i*((h-40)/4); x.beginPath(); x.moveTo(30,y); x.lineTo(w-10,y); x.stroke(); }
+  const series=[
+    [40,55,48,70,90,110,100,120,95,130,150,140],
+    [30,42,50,45,60,80,85,70,90,100,110,105],
+    [20,25,40,55,50,65,70,60,75,80,95,90],
+  ];
+  const colors=['#1BFC9E','#6aa7ff','#f5c542'];
+  series.forEach((s,si)=>{
+    x.strokeStyle=colors[si]; x.lineWidth=2; x.beginPath();
+    s.forEach((v,i)=>{
+      const px=30+i*((w-50)/(s.length-1));
+      const py=h-20-(v/160)*(h-40);
+      if(i===0) x.moveTo(px,py); else x.lineTo(px,py);
+    });
+    x.stroke();
+  });
+}
+function render(){ renderKpis(); renderTable(); renderFeed(); renderChart(); }
+
+if(sessionStorage.getItem(KEY)==='1') unlock();
+render();
+</script>
+</body>
+</html>
